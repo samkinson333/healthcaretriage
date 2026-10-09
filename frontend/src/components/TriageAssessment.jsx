@@ -11,6 +11,18 @@ const OBSERVATION_FIELDS = [
   { name: 'consciousness', label: 'Consciousness', unit: 'AVPU', type: 'select', options: ['alert', 'confusion', 'voice', 'pain', 'unresponsive'] },
 ]
 
+const SYMPTOM_FLAGS = [
+  ['chest_pain', 'Chest pain'],
+  ['stroke_signs', 'Stroke signs'],
+  ['severe_breathlessness', 'Severe breathlessness'],
+  ['vomiting_blood', 'Vomiting blood'],
+  ['airway_compromise', 'Airway compromise'],
+  ['active_seizure', 'Active seizure'],
+  ['severe_bleeding', 'Severe bleeding'],
+  ['anaphylaxis', 'Anaphylaxis'],
+  ['unresponsive', 'Unresponsive'],
+]
+
 export default function TriageAssessment({ patient, onCreated }) {
   const [values, setValues] = useState({
     pregnant: false,
@@ -42,6 +54,15 @@ export default function TriageAssessment({ patient, onCreated }) {
     setValues(prev => ({
       ...prev,
       observations: { ...prev.observations, [field]: { value: finalValue, source } },
+    }))
+  }
+
+  function toggleSymptom(symptom) {
+    setValues((prev) => ({
+      ...prev,
+      symptoms: prev.symptoms.includes(symptom)
+        ? prev.symptoms.filter((value) => value !== symptom)
+        : [...prev.symptoms, symptom],
     }))
   }
 
@@ -97,7 +118,7 @@ export default function TriageAssessment({ patient, onCreated }) {
             {OBSERVATION_FIELDS.map(field => (
               <div className="field" key={field.name}>
                 <label htmlFor={field.name}>
-                  {field.label} <small>({field.unit})</small>
+                  {field.label} {field.unit && <small>({field.unit})</small>}
                 </label>
                 {field.type === 'select' ? (
                   <select
@@ -145,6 +166,19 @@ export default function TriageAssessment({ patient, onCreated }) {
               {' '}Nurse Concern
             </label>
           </div>
+
+          <fieldset className="symptom-flags">
+            <legend>Urgency flags</legend>
+            <p className="hint">Select any observed symptom that applies. These flags can increase the provisional priority.</p>
+            <div className="flag-grid">
+              {SYMPTOM_FLAGS.map(([value, label]) => (
+                <label key={value}>
+                  <input type="checkbox" checked={values.symptoms.includes(value)} onChange={() => toggleSymptom(value)} />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
 
           <button type="submit" className="btn" disabled={busy || !patient}>
             {busy ? 'Analyzing...' : 'Submit assessment'}

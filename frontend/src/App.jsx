@@ -3,7 +3,8 @@ import PatientPanel from './components/PatientPanel'
 import VitalsForm from './components/VitalsForm'
 import VitalsSummary from './components/VitalsSummary'
 import TriageAssessment from './components/TriageAssessment'
-import PriorityQueue from './components/PriorityQueue'
+import DoctorDashboard from './components/DoctorDashboard'
+import NurseWorklist from './components/NurseWorklist'
 import { getPatientVitals, listPatients, getQueue, advanceDemoClock } from './services/api'
 
 export default function App() {
@@ -12,6 +13,7 @@ export default function App() {
   const [measurements, setMeasurements] = useState([])
   const [queue, setQueue] = useState([])
   const [error, setError] = useState(null)
+  const [nurseViewOpen, setNurseViewOpen] = useState(false)
 
   const selectedPatient = patients.find((patient) => patient.id === selectedId) || null
 
@@ -60,13 +62,20 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Healthcare Triage</h1>
-        <p>Patient vitals intake — prototype, synthetic data only.</p>
+        <div>
+          <h1>Healthcare Triage</h1>
+          <p>Patient vitals intake — prototype, synthetic data only.</p>
+        </div>
+        <button type="button" className="button-secondary top-worklist-button" onClick={() => setNurseViewOpen((open) => !open)}>
+          {nurseViewOpen ? 'Doctor dashboard' : 'Nurse worklist'}
+        </button>
       </header>
 
       {error && <p className="notice notice-error">{error}</p>}
 
-      <main className="layout">
+      {nurseViewOpen ? (
+        <NurseWorklist queue={queue} onClose={() => setNurseViewOpen(false)} />
+      ) : <main className="layout">
         <PatientPanel
           patients={patients}
           selectedId={selectedId}
@@ -76,8 +85,15 @@ export default function App() {
         <VitalsForm patient={selectedPatient} onSubmitted={handleSubmitted} />
         <VitalsSummary patient={selectedPatient} measurements={measurements} />
         <TriageAssessment patient={selectedPatient} onCreated={refreshQueue} />
-        <PriorityQueue queue={queue} onRefresh={refreshQueue} onAdvanceClock={async (m) => { await advanceDemoClock(m); refreshQueue(); }} />
-      </main>
+        <DoctorDashboard
+          queue={queue}
+          onRefresh={refreshQueue}
+          onAdvanceClock={async (minutes) => {
+            await advanceDemoClock(minutes)
+            await refreshQueue()
+          }}
+        />
+      </main>}
     </div>
   )
 }
