@@ -29,6 +29,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `urls.py`: Root URL routing configuration.
   - `wsgi.py` / `asgi.py`: WSGI and ASGI entry points for deployment.
 - **`manage.py`**: Command-line utility for administrative tasks.
-- **`.env`**: Local environment variables (`DEBUG`, `SECRET_KEY`, `ALLOWED_HOSTS`, `DATABASE_URL`).
-- **`.env.example`**: Example template for environment configuration.
+- **`.env`**: Local environment variables (`DEBUG`, `SECRET_KEY`, `ALLOWED_HOSTS`, `DATABASE_URL`). It is generated from `.env.example` on first Django startup and is ignored by Git.
+- **`.env.example`**: Committed template for environment configuration; update this when adding shared environment variables.
 - **`requirements.txt`**: Python dependencies list.

@@ -11,14 +11,35 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 import os
+import secrets
 from pathlib import Path
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env file
-load_dotenv(BASE_DIR / '.env')
+ENV_FILE = BASE_DIR / '.env'
+ENV_EXAMPLE_FILE = BASE_DIR / '.env.example'
+
+
+def ensure_env_file():
+    """Create a local development environment file on first startup."""
+    if ENV_FILE.exists() or not ENV_EXAMPLE_FILE.exists():
+        return
+
+    contents = ENV_EXAMPLE_FILE.read_text(encoding='utf-8')
+    contents = contents.replace(
+        'SECRET_KEY=change-me-in-production',
+        f'SECRET_KEY={secrets.token_urlsafe(50)}',
+    )
+    ENV_FILE.write_text(contents, encoding='utf-8')
+    ENV_FILE.chmod(0o600)
+
+
+ensure_env_file()
+
+# Load environment variables from the local .env file.
+load_dotenv(ENV_FILE)
 
 
 # Quick-start development settings - unsuitable for production
