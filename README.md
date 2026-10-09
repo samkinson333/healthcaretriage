@@ -46,14 +46,27 @@ Future development may connect OP registration and screening measurements from c
 git clone https://github.com/samkinson333/healthcaretriage.git
 ```
 
-Install the React frontend and Django backend dependencies according to the repository README. Start the frontend using its configured development command. For Django, install the required Python dependencies, apply database migrations, and run the development server.
+Install the React frontend and Django backend dependencies, then start each development server.
+
+Backend (from `backend/`):
 
 ```bash
+source ./activate_env.sh
 python manage.py migrate
 python manage.py runserver
 ```
 
-Use the actual repository configuration and README to confirm the correct startup commands.
+`activate_env.sh` creates and activates `backend/.venv` on first use, and installs
+the backend requirements. A local `backend/.env` is provided for development and is
+ignored by Git. Copy or edit `.env.example` when configuring another environment;
+use a unique secret key and `DEBUG=False` in production.
+
+Frontend (from `frontend/`):
+
+```bash
+npm install
+npm run dev
+```
 
 ## 7. Output Screenshots
 

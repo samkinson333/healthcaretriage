@@ -73,3 +73,10 @@ export function recordDeterioration(assessmentId, requestId) {
     body: JSON.stringify({ request_id: requestId }),
   })
 }
+
+export function assignResponder(assessmentId, payload) {
+  return request(`/assessments/${assessmentId}/assignment/`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
