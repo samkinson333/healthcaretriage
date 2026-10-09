@@ -44,3 +44,32 @@ export function submitVitals(patientId, payload) {
     body: JSON.stringify(payload),
   })
 }
+
+export function createAssessment(patientId, payload) {
+  return request(`/patients/${patientId}/assessments/`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function getAssessment(assessmentId) {
+  return request(`/assessments/${assessmentId}/`)
+}
+
+export function getQueue() {
+  return request('/queue/')
+}
+
+export function advanceDemoClock(minutes) {
+  return request('/demo/clock/', {
+    method: 'POST',
+    body: JSON.stringify({ minutes }),
+  })
+}
+
+export function recordDeterioration(assessmentId, requestId) {
+  return request(`/assessments/${assessmentId}/deterioration/`, {
+    method: 'POST',
+    body: JSON.stringify({ request_id: requestId }),
+  })
+}

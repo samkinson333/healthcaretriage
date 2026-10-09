@@ -26,6 +26,74 @@ class Patient(models.Model):
         return self.reference
 
 
+class TriageAssessment(models.Model):
+    class UrgencyLevel(models.TextChoices):
+        U1 = 'U1', 'U1 Immediate'
+        U2 = 'U2', 'U2 Urgent'
+        U3 = 'U3 Soon'
+        U4 = 'U4 Standard'
+        U5 = 'U5 Low'
+
+    class State(models.TextChoices):
+        WAITING = 'waiting', 'Waiting'
+        IN_CONSULTATION = 'in_consultation', 'In consultation'
+        COMPLETED = 'completed', 'Completed'
+
+    patient = models.ForeignKey(
+        Patient,
+        on_delete=models.CASCADE,
+        related_name='assessments',
+    )
+    inputs = models.JSONField(default=dict)
+    recommendation = models.CharField(max_length=20, choices=UrgencyLevel.choices)
+    effective_level = models.CharField(max_length=20, choices=UrgencyLevel.choices)
+    fired_rules = models.JSONField(default=list)
+    news2_breakdown = models.JSONField(default=dict)
+    warnings = models.JSONField(default=list)
+    rule_version = models.CharField(max_length=40)
+    state = models.CharField(max_length=20, choices=State.choices, default=State.WAITING)
+    arrived_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-arrived_at', '-id']
+        indexes = [
+            models.Index(fields=['state', 'effective_level', 'arrived_at']),
+            models.Index(fields=['patient', '-created_at']),
+        ]
+
+    def __str__(self):
+        return f'{self.patient.reference} {self.effective_level}'
+
+
+class QueueEvent(models.Model):
+    class EventType(models.TextChoices):
+        ASSESSMENT_CREATED = 'assessment_created', 'Assessment created'
+        CLOCK_ADVANCED = 'clock_advanced', 'Clock advanced'
+        DETERIORATION = 'deterioration', 'Deterioration'
+        OVERRIDE = 'override', 'Override'
+        STATE_CHANGED = 'state_changed', 'State changed'
+
+    assessment = models.ForeignKey(
+        TriageAssessment,
+        on_delete=models.CASCADE,
+        related_name='events',
+    )
+    event_type = models.CharField(max_length=40, choices=EventType.choices)
+    before = models.JSONField(default=dict)
+    after = models.JSONField(default=dict)
+    reason = models.TextField(blank=True)
+    occurred_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-occurred_at', '-id']
+        indexes = [models.Index(fields=['assessment', '-occurred_at'])]
+
+    def __str__(self):
+        return f'{self.assessment_id} {self.event_type}'
+
+
 class VitalMeasurement(models.Model):
     class Source(models.TextChoices):
         MANUAL = 'manual', 'Manual'

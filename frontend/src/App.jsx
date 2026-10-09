@@ -2,21 +2,34 @@ import { useCallback, useEffect, useState } from 'react'
 import PatientPanel from './components/PatientPanel'
 import VitalsForm from './components/VitalsForm'
 import VitalsSummary from './components/VitalsSummary'
-import { getPatientVitals, listPatients } from './services/api'
+import TriageAssessment from './components/TriageAssessment'
+import PriorityQueue from './components/PriorityQueue'
+import { getPatientVitals, listPatients, getQueue, advanceDemoClock } from './services/api'
 
 export default function App() {
   const [patients, setPatients] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [measurements, setMeasurements] = useState([])
+  const [queue, setQueue] = useState([])
   const [error, setError] = useState(null)
 
   const selectedPatient = patients.find((patient) => patient.id === selectedId) || null
+
+  const refreshQueue = useCallback(async () => {
+    try {
+      const data = await getQueue()
+      setQueue(data.queue)
+    } catch (err) {
+      setError(err.message)
+    }
+  }, [])
 
   useEffect(() => {
     listPatients()
       .then((data) => setPatients(data.patients))
       .catch((err) => setError(err.message))
-  }, [])
+    refreshQueue()
+  }, [refreshQueue])
 
   const loadVitals = useCallback(async (patientId) => {
     if (!patientId) {
@@ -62,6 +75,8 @@ export default function App() {
         />
         <VitalsForm patient={selectedPatient} onSubmitted={handleSubmitted} />
         <VitalsSummary patient={selectedPatient} measurements={measurements} />
+        <TriageAssessment patient={selectedPatient} onCreated={refreshQueue} />
+        <PriorityQueue queue={queue} onRefresh={refreshQueue} onAdvanceClock={async (m) => { await advanceDemoClock(m); refreshQueue(); }} />
       </main>
     </div>
   )
