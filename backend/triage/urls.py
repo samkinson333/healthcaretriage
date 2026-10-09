@@ -11,5 +11,6 @@ urlpatterns = [
     path('assessments/<int:pk>/', views.assessment_detail, name='assessment-detail'),
     path('demo/clock/', views.demo_clock, name='demo-clock'),
     path('queue/', views.queue_list, name='queue-list'),
+    path('assessments/<int:pk>/assignment/', views.assign_responder, name='assign-responder'),
     path('assessments/<int:pk>/deterioration/', views.record_deterioration, name='record-deterioration'),
 ]

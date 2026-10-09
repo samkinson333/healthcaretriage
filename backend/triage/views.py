@@ -59,6 +59,7 @@ def assessment_to_dict(assessment):
         'id': assessment.id,
         'patient': patient_to_dict(assessment.patient),
         'inputs': assessment.inputs,
+        'assignment': assessment.inputs.get('assignment', {}),
         'recommendation': assessment.recommendation,
         'effective_level': assessment.effective_level,
         'fired_rules': assessment.fired_rules,
@@ -185,6 +186,45 @@ def demo_clock(request):
 @require_http_methods(['GET'])
 def queue_list(request):
     return JsonResponse({'queue': get_waiting_queue()})
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+def assign_responder(request, pk):
+    assessment = get_object_or_404(TriageAssessment, pk=pk)
+    payload, error = _parse_json(request)
+    if error:
+        return JsonResponse(error_response({}, error), status=400)
+
+    role = str(payload.get('role', '')).strip().lower()
+    assignee = str(payload.get('assignee', '')).strip()
+    errors = {}
+    if role not in {'nurse', 'trainee'}:
+        errors['role'] = 'Role must be nurse or trainee.'
+    if not assignee:
+        errors['assignee'] = 'Assignee is required.'
+    if assessment.effective_level not in {'U1', 'U2'}:
+        errors['assignment'] = 'Emergency handoff is available only for U1/U2 cases.'
+    if assessment.state != TriageAssessment.State.WAITING:
+        errors['state'] = 'Only waiting patients can be assigned.'
+    if errors:
+        return JsonResponse(error_response(errors), status=400)
+
+    before_snapshot = {'assignment': assessment.inputs.get('assignment', {})}
+    assignment = {'role': role, 'assignee': assignee}
+    assessment.inputs = {**assessment.inputs, 'assignment': assignment}
+    assessment.save(update_fields=['inputs'])
+
+    QueueEvent.objects.create(
+        assessment=assessment,
+        event_type=QueueEvent.EventType.STATE_CHANGED,
+        before=before_snapshot,
+        after={'assignment': assignment},
+        reason='Emergency responder handoff assigned',
+        occurred_at=timezone.now(),
+    )
+
+    return JsonResponse(assessment_to_dict(assessment), status=200)
 
 
 @csrf_exempt

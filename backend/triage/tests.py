@@ -553,6 +553,41 @@ class AssessmentApiTests(TestCase):
         self.assertEqual(res.status_code, 400)
         self.assertIn('Only waiting patients', res.json()['error'])
 
+    def test_assign_responder_records_assignment_for_u1_u2_queue_case(self):
+        created = self._post(self.valid_payload(symptoms=['chest_pain'])).json()
+        url = reverse('assign-responder', args=[created['id']])
+        response = self.client.post(
+            url,
+            data=json.dumps({'role': 'nurse', 'assignee': 'Nurse A'}),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['assignment'], {'role': 'nurse', 'assignee': 'Nurse A'})
+
+        queue_response = self.client.get(reverse('queue-list'))
+        self.assertEqual(queue_response.json()['queue'][0]['assignment'], {'role': 'nurse', 'assignee': 'Nurse A'})
+
+    def test_assign_responder_rejects_non_emergency_case(self):
+        created = self._post(self.valid_payload(symptoms=[])).json()
+        response = self.client.post(
+            reverse('assign-responder', args=[created['id']]),
+            data=json.dumps({'role': 'nurse', 'assignee': 'Nurse A'}),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('assignment', response.json()['errors'])
+
+    def test_assign_responder_validates_payload(self):
+        created = self._post(self.valid_payload(symptoms=['chest_pain'])).json()
+        response = self.client.post(
+            reverse('assign-responder', args=[created['id']]),
+            data=json.dumps({'role': 'doctor', 'assignee': ''}),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('role', response.json()['errors'])
+        self.assertIn('assignee', response.json()['errors'])
+
 
 class AssessmentModelTests(TestCase):
     def setUp(self):

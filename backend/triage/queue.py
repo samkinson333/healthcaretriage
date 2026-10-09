@@ -54,6 +54,7 @@ def format_queue_row(assessment, now=None):
         'wait_minutes': wait,
         'needs_reassessment': wait > threshold,
         'fired_rules': assessment.fired_rules,
+        'assignment': assessment.inputs.get('assignment', {}),
         'state': assessment.state,
         'arrived_at': assessment.arrived_at.isoformat(),
         'arrived_at_sort': assessment.arrived_at,
