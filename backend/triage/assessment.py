@@ -35,7 +35,28 @@ def _score_band(value, bands):
     return None
 
 
-def _score_observations(observations):
+# NEWS2 SpO2 scales (RCP 2017). Scale 1 is the default for most patients.
+# Scale 2 is for patients at risk of hypercapnic respiratory failure, where the
+# target saturation is lower (88-92%) and the scoring bands differ.
+SPO2_SCALE_1 = [(-999, 91, 3), (92, 93, 2), (94, 95, 1), (96, 999, 0)]
+SPO2_SCALE_2 = [(-999, 83, 3), (84, 85, 2), (86, 87, 1), (88, 92, 0), (93, 94, 1), (95, 96, 2), (97, 999, 3)]
+
+# NEWS2 ACVPU consciousness scale. Only 'alert' scores 0; new confusion, voice,
+# pain and unresponsive each score 3. The category is kept so the NEWS2-specific
+# 'new confusion' signal is not discarded.
+ACVPU_POINTS = {'alert': 0, 'confusion': 3, 'voice': 3, 'pain': 3, 'unresponsive': 3}
+
+
+def _score_spo2(spo2, scale):
+    bands = SPO2_SCALE_2 if scale == 2 else SPO2_SCALE_1
+    return _score_band(spo2, bands)
+
+
+def _score_consciousness(consciousness):
+    return ACVPU_POINTS.get(consciousness, 3)
+
+
+def _score_observations(observations, spo2_scale=1):
     missing = []
     warnings = []
     parts = {}
@@ -58,23 +79,25 @@ def _score_observations(observations):
     pulse = observations['pulse']
     consciousness = observations['consciousness']
 
-    # Prototype implementation of NEWS2 SpO2 Scale 1 bands. The rules are
+    # Prototype implementation of the NEWS2 bands (RCP 2017). The rules are
     # unvalidated in this project and must be reviewed before real use.
     definitions = {
         'respiratory_rate': _score_band(rr, [(-999, 8, 3), (9, 11, 1), (12, 20, 0), (21, 24, 2), (25, 999, 3)]),
-        'spo2': _score_band(spo2, [(-999, 91, 3), (92, 93, 2), (94, 95, 1), (96, 999, 0)]),
+        'spo2': _score_spo2(spo2, spo2_scale),
         'supplemental_oxygen': 2 if oxygen else 0,
         'temperature_c': _score_band(temp, [(-999, 35.0, 3), (35.1, 36.0, 1), (36.1, 38.0, 0), (38.1, 39.0, 1), (39.1, 999, 2)]),
         'systolic_bp': _score_band(systolic, [(-999, 90, 3), (91, 100, 2), (101, 110, 1), (111, 219, 0), (220, 999, 3)]),
         'pulse': _score_band(pulse, [(-999, 40, 3), (41, 50, 1), (51, 90, 0), (91, 110, 1), (111, 130, 2), (131, 999, 3)]),
-        'consciousness': 0 if consciousness == 'alert' else 3,
+        'consciousness': _score_consciousness(consciousness),
     }
 
     total = sum(definitions.values())
     for field, points in definitions.items():
         parts[field] = {'value': observations[field], 'points': points}
+    parts['spo2']['scale'] = spo2_scale
+    parts['consciousness']['acvpu'] = consciousness
 
-    return {'total': total, 'parameters': parts, 'missing': []}, warnings, False
+    return {'total': total, 'parameters': parts, 'missing': [], 'spo2_scale': spo2_scale}, warnings, False
 
 
 def _add_rule(fired_rules, rule_id, reason):
@@ -101,12 +124,13 @@ def assess(inputs):
     age = inputs.get('age')
     pregnant = bool(inputs.get('pregnant'))
     nurse_concern = bool(inputs.get('nurse_concern'))
+    spo2_scale = inputs.get('spo2_scale', 1)
 
     fired_rules = []
     recommendation = 'U4'
     direct_clinician_assessment = False
 
-    breakdown, warnings, missing_or_unknown = _score_observations(observations)
+    breakdown, warnings, missing_or_unknown = _score_observations(observations, spo2_scale)
 
     r1_hits = [label for key, label in R1_SYMPTOMS.items() if key in symptoms]
     if r1_hits:

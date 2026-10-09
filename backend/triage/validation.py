@@ -36,6 +36,7 @@ ASSESSMENT_REQUIRED_OBSERVATIONS = [
 
 ASSESSMENT_SOURCES = {'manual', 'device'}
 ASSESSMENT_CONSCIOUSNESS = {'alert', 'confusion', 'voice', 'pain', 'unresponsive'}
+ASSESSMENT_SPO2_SCALES = {1, 2}
 ASSESSMENT_SYMPTOMS = {
     'unresponsive',
     'airway_compromise',
@@ -187,6 +188,12 @@ def validate_assessment(data):
         errors['nurse_concern'] = 'Nurse concern must be true or false.'
     else:
         cleaned['nurse_concern'] = nurse_concern
+
+    spo2_scale = data.get('spo2_scale', 1)
+    if isinstance(spo2_scale, bool) or spo2_scale not in ASSESSMENT_SPO2_SCALES:
+        errors['spo2_scale'] = 'SpO2 scale must be 1 or 2.'
+    else:
+        cleaned['spo2_scale'] = spo2_scale
 
     raw_symptoms = data.get('symptoms', [])
     if not isinstance(raw_symptoms, list):

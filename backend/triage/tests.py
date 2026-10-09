@@ -172,6 +172,56 @@ class AssessmentEngineTests(TestCase):
         self.assertEqual(result['news2_breakdown']['total'], 5)
         self.assertIn('R4', [rule['id'] for rule in result['fired_rules']])
 
+    def test_spo2_scale_2_scores_target_range_as_zero(self):
+        result = assess(self.valid_input(
+            spo2_scale=2,
+            observations={
+                'respiratory_rate': 16,
+                'spo2': 90,
+                'supplemental_oxygen': False,
+                'temperature_c': 36.8,
+                'systolic_bp': 120,
+                'pulse': 72,
+                'consciousness': 'alert',
+            },
+        ))
+        self.assertEqual(result['news2_breakdown']['total'], 0)
+        self.assertEqual(result['news2_breakdown']['spo2_scale'], 2)
+        self.assertEqual(result['news2_breakdown']['parameters']['spo2']['points'], 0)
+        self.assertEqual(result['recommendation'], 'U4')
+
+    def test_spo2_scale_2_boundaries_match_news2_bands(self):
+        expected_points = {
+            83: 3,
+            84: 2,
+            85: 2,
+            86: 1,
+            87: 1,
+            88: 0,
+            92: 0,
+            93: 1,
+            94: 1,
+            95: 2,
+            96: 2,
+            97: 3,
+        }
+        for spo2, expected in expected_points.items():
+            with self.subTest(spo2=spo2):
+                observations = self.valid_input()['observations']
+                observations['spo2'] = spo2
+                result = assess(self.valid_input(spo2_scale=2, observations=observations))
+                self.assertEqual(result['news2_breakdown']['parameters']['spo2']['points'], expected)
+
+    def test_consciousness_keeps_acvpu_category_and_scores_three_when_not_alert(self):
+        for category in ('confusion', 'voice', 'pain', 'unresponsive'):
+            with self.subTest(category=category):
+                observations = self.valid_input()['observations']
+                observations['consciousness'] = category
+                result = assess(self.valid_input(observations=observations))
+                consciousness = result['news2_breakdown']['parameters']['consciousness']
+                self.assertEqual(consciousness['points'], 3)
+                self.assertEqual(consciousness['acvpu'], category)
+
     def test_single_parameter_score_three_returns_at_least_u3(self):
         result = assess(self.valid_input(observations={
             'respiratory_rate': 8,
@@ -278,6 +328,21 @@ class AssessmentValidationTests(TestCase):
         cleaned, errors = validate_assessment(payload)
         self.assertIn('symptoms', errors)
         self.assertIn('observations.pulse.source', errors)
+
+    def test_spo2_scale_defaults_to_scale_one_and_accepts_scale_two(self):
+        cleaned, errors = validate_assessment(self.valid_payload())
+        self.assertEqual(errors, {})
+        self.assertEqual(cleaned['spo2_scale'], 1)
+
+        cleaned, errors = validate_assessment(self.valid_payload(spo2_scale=2))
+        self.assertEqual(errors, {})
+        self.assertEqual(cleaned['spo2_scale'], 2)
+
+    def test_invalid_spo2_scale_values_are_rejected(self):
+        for scale in (0, 3, True, '2'):
+            with self.subTest(scale=scale):
+                cleaned, errors = validate_assessment(self.valid_payload(spo2_scale=scale))
+                self.assertIn('spo2_scale', errors)
 
     def test_numeric_strings_are_cleaned_but_empty_string_is_missing(self):
         payload = self.valid_payload()
@@ -468,7 +533,7 @@ class AssessmentApiTests(TestCase):
         self.assertEqual(res.status_code, 400)
 
         # Check events
-        events = list(QueueEvent.objects.filter(assessment_id=created['id']).order_by('occurred_at'))
+        events = list(QueueEvent.objects.filter(assessment_id=created['id']).order_by('occurred_at', 'id'))
         self.assertEqual(len(events), 3)
         self.assertEqual(events[0].before['effective_level'], 'U4')
         self.assertEqual(events[0].after['effective_level'], 'U3')

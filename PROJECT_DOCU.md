@@ -107,7 +107,7 @@ U1–U5 are project labels, **not ESI levels**.
 | R9 | Nurse concern flag | Raise urgency by one level |
 | R10 | Clinician override | Any level, mandatory reason, original preserved |
 
-R1, R2, R7 and R9 are team-proposed and need clinical review. R3–R5 follow NEWS2 thresholds (SpO₂ Scale 1). **Open item:** rule precedence, how simultaneous rules combine, R9 interaction with U1/U5, and how an override interacts with later automatic reassessment are not yet specified and need tests.
+R1, R2, R7 and R9 are team-proposed and need clinical review. R3–R5 follow NEWS2 thresholds, with NEWS2 SpO₂ Scale 1 by default and Scale 2 available when staff select the hypercapnic respiratory failure risk pathway. **Open item:** rule precedence, how simultaneous rules combine, R9 interaction with U1/U5, and how an override interacts with later automatic reassessment are not yet specified and need tests.
 
 ### 4.4 Queue scheduling
 
@@ -287,7 +287,7 @@ All sample patients and measurements must be labelled synthetic.
 
 - Rules are unvalidated and not yet clinically reviewed.
 - Short red-flag list; trauma, poisoning, snakebite, self-harm and diabetic emergencies are not covered.
-- NEWS2 has no frailty adjustment; SpO₂ Scale 1 only (unsuitable for some groups, e.g. chronic CO₂ retention).
+- NEWS2 has no frailty adjustment; SpO₂ Scale 2 is supported only when staff explicitly select the hypercapnic respiratory failure risk pathway.
 - Children and pregnant patients are outside the supported workflow.
 - Simulation is synthetic with one clinician; priority scheduling lengthens some lower-urgency waits.
 - Browser state resets on refresh; no real login or persistence.
