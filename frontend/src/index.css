@@ -1,3 +1,4 @@
+/* ... (previous :root styles) ... */
 :root {
   --bg: #f4f6f8;
   --surface: #ffffff;
@@ -14,10 +15,47 @@
   --warning-soft: #fbf1dd;
   --high: #a11f1f;
   --high-soft: #f8e6e6;
+
+  /* Urgency levels */
+  --u1: #d32f2f;
+  --u1-soft: #ffebee;
+  --u2: #e64a19;
+  --u2-soft: #fbe9e7;
+  --u3: #fbc02d;
+  --u3-soft: #fff9c4;
+  --u4: #388e3c;
+  --u4-soft: #e8f5e9;
+  --u5: #1976d2;
+  --u5-soft: #e3f2fd;
+
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);
 }
+
+/* ... */
+
+.chip {
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.chip-u1 { background: var(--u1-soft); color: var(--u1); }
+.chip-u2 { background: var(--u2-soft); color: var(--u2); }
+.chip-u3 { background: var(--u3-soft); color: var(--u3); }
+.chip-u4 { background: var(--u4-soft); color: var(--u4); }
+.chip-u5 { background: var(--u5-soft); color: var(--u5); }
+
+.btn-sm {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    margin-left: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+/* ... rest ... */
 
 body {
   margin: 0;
