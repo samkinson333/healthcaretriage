@@ -1,36 +1,49 @@
 /* ... (previous :root styles) ... */
 :root {
-  --bg: #f4f6f8;
-  --surface: #ffffff;
-  --border: #d5dbe1;
-  --text: #1f2937;
-  --muted: #5b6672;
-  --accent: #11507a;
-  --accent-soft: #e4eef6;
-  --error: #b3261e;
-  --error-soft: #fbeae9;
-  --success: #1b6b3a;
-  --success-soft: #e6f3eb;
-  --warning: #8a5a00;
-  --warning-soft: #fbf1dd;
-  --high: #a11f1f;
-  --high-soft: #f8e6e6;
+  /* SmartTriage UI Greens (Complete Green UI) */
+  --paper: #EEF6F6;       /* Soft mint/teal background */
+  --surface: #FFFFFF;     /* Pure white for panels to maintain clinical readability */
+  --line: #CCE0DF;        /* Soft green/teal borders */
+  --ink: #093339;         /* Very dark green-black for primary text */
+  --ink-soft: #385F65;    /* Muted dark green for secondary text */
+  
+  /* SmartTriage Brand - Medical Green */
+  --brand: #0A5A4A;       /* Deeper, more emerald medical green */
+  --brand-soft: #DFF0ED;  /* Soft emerald background */
+
+  /* Aliasing old tokens to new system for backward compatibility in components */
+  --bg: var(--paper);
+  --border: var(--line);
+  --text: var(--ink);
+  --muted: var(--ink-soft);
+  --accent: var(--brand);
+  --accent-soft: var(--brand-soft);
+
+  /* Functional */
+  --error: #B3261E;
+  --error-soft: #FBE9E7;
+  --success: #1B6B3A;
+  --success-soft: #E6F3EB;
+  --warning: #8A6A00;
+  --warning-soft: #FAF1D2;
+  --high: #C4570F;
+  --high-soft: #FCEDE0;
 
   /* Urgency levels */
-  --u1: #d32f2f;
-  --u1-soft: #ffebee;
-  --u2: #e64a19;
-  --u2-soft: #fbe9e7;
-  --u3: #fbc02d;
-  --u3-soft: #fff9c4;
-  --u4: #388e3c;
-  --u4-soft: #e8f5e9;
-  --u5: #1976d2;
-  --u5-soft: #e3f2fd;
+  --u1: #B3261E;
+  --u1-soft: #FBE9E7;
+  --u2: #C4570F;
+  --u2-soft: #FCEDE0;
+  --u3: #8A6A00;
+  --u3-soft: #FAF1D2;
+  --u4: #2B6A9B;
+  --u4-soft: #E4EFF7;
+  --u5: #5B6772;
+  --u5-soft: #ECEFF2;
 
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  color: var(--text);
-  background: var(--bg);
+  font-family: "Atkinson Hyperlegible Next", system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
 }
 
 /* ... */
@@ -124,11 +137,11 @@ body {
 .urgency span { font-size: .78rem; font-weight: 700; }
 .urgency strong { display: block; font-size: 1.3rem; line-height: 1.2; }
 .urgency small { font-size: .72rem; }
-.urgency-u1 { background: #fbe5e5; color: #991b1b; }
-.urgency-u2 { background: #fff0dc; color: #9a4f00; }
-.urgency-u3 { background: #fff8d9; color: #705800; }
-.urgency-u4 { background: #e8f2fa; color: #175679; }
-.urgency-u5 { background: #e7f3eb; color: #1b6b3a; }
+.urgency-u1 { background: var(--u1-soft); color: var(--u1); }
+.urgency-u2 { background: var(--u2-soft); color: var(--u2); }
+.urgency-u3 { background: var(--u3-soft); color: var(--u3); }
+.urgency-u4 { background: var(--u4-soft); color: var(--u4); }
+.urgency-u5 { background: var(--u5-soft); color: var(--u5); }
 
 .case-list { display: grid; gap: .75rem; }
 .case-card { display: grid; grid-template-columns: 2.25rem minmax(0, 1fr) auto; align-items: start; gap: .9rem; border: 1px solid var(--border); border-left: 5px solid #7b8794; border-radius: 8px; padding: .9rem; }
@@ -409,4 +422,125 @@ td {
 th {
   color: var(--muted);
   font-weight: 600;
+}
+
+/* App Shell Layout */
+.app-shell {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.app-sidebar {
+  width: 260px;
+  background: var(--brand);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  flex-shrink: 0;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  padding: 0 0.5rem;
+}
+
+.brand-logo h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-grow: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.nav-item.active {
+  background: var(--surface);
+  color: var(--brand);
+}
+
+.demo-tag {
+  margin-top: auto;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.app-main-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: 1.5rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.app-topbar h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.4rem;
+  color: var(--ink);
+}
+
+.app-topbar p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.app-main-content {
+  padding: 2.5rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* Enhancing Cards to look more professional */
+.card, .doctor-dashboard, .nurse-worklist {
+  box-shadow: 0 4px 12px rgba(9, 51, 57, 0.05); /* Subtle green-tinted shadow */
+  border-color: var(--line);
 }

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { assignResponder, recordDeterioration } from '../services/api'
+import UrgencyChip from './UrgencyChip'
 
 const LEVEL_COPY = {
   U1: { label: 'Immediate', action: 'See now' },
@@ -121,7 +122,7 @@ export default function DoctorDashboard({ queue, onRefresh, onAdvanceClock }) {
           <div className="response-list">
             {assignedCases.map((row) => (
               <div className="response-item" key={row.id}>
-                <span className={`urgency-chip ${levelClass(row.display_level)}`}>{row.display_level}</span>
+                <UrgencyChip level={row.display_level} />
                 <strong>{row.patient.reference} · {row.patient.full_name || 'Unnamed patient'}</strong>
                 <span>Assigned to {row.assignment.role}: <strong>{row.assignment.assignee}</strong></span>
               </div>
@@ -149,9 +150,7 @@ export default function DoctorDashboard({ queue, onRefresh, onAdvanceClock }) {
                       <p className="patient-reference">{row.patient.reference}</p>
                       <h3>{row.patient.full_name || 'Unnamed patient'}</h3>
                     </div>
-                    <span className={`urgency-chip ${levelClass(row.display_level)}`}>
-                      {row.display_level} <span>{level.label}</span>
-                    </span>
+                    <UrgencyChip level={row.display_level} />
                   </div>
                   <p className="case-complaint">{row.complaint || 'No presenting complaint recorded.'}</p>
                   <div className="case-meta">

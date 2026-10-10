@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import UrgencyChip from './UrgencyChip'
 
 export default function NurseWorklist({ queue, onClose }) {
   const nurseCases = useMemo(
@@ -43,7 +44,7 @@ export default function NurseWorklist({ queue, onClose }) {
           {visibleCases.map((row) => (
             <article className="nurse-case" key={row.id}>
               <div className="nurse-case-heading">
-                <span className={`urgency-chip urgency urgency-${row.display_level.toLowerCase()}`}>{row.display_level}</span>
+                <UrgencyChip level={row.display_level} />
                 <span className="reassess-note">Assigned to you</span>
               </div>
               <h3>{row.patient.full_name || 'Unnamed patient'}</h3>
