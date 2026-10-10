@@ -132,16 +132,40 @@ body {
 .button-danger { background: var(--high); border: 1px solid var(--high); color: #fff; }
 .button-danger:disabled, .button-secondary:disabled { cursor: not-allowed; opacity: .55; }
 
-.severity-summary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .6rem; margin: 1.25rem 0; }
-.urgency { border: 1px solid currentColor; border-radius: 8px; padding: .55rem .65rem; }
-.urgency span { font-size: .78rem; font-weight: 700; }
-.urgency strong { display: block; font-size: 1.3rem; line-height: 1.2; }
-.urgency small { font-size: .72rem; }
-.urgency-u1 { background: var(--u1-soft); color: var(--u1); }
-.urgency-u2 { background: var(--u2-soft); color: var(--u2); }
-.urgency-u3 { background: var(--u3-soft); color: var(--u3); }
-.urgency-u4 { background: var(--u4-soft); color: var(--u4); }
-.urgency-u5 { background: var(--u5-soft); color: var(--u5); }
+.severity-summary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.urgency { 
+  background: var(--surface); 
+  border: 1px solid var(--line); 
+  border-radius: 10px; 
+  padding: 1.25rem 1rem; 
+  box-shadow: 0 4px 12px rgba(9, 51, 57, 0.04);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.urgency::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+}
+.urgency span { font-size: 0.85rem; font-weight: 700; color: var(--ink-soft); }
+.urgency strong { display: block; font-size: 2.4rem; line-height: 1.1; font-weight: 700; margin: 0.4rem 0; }
+.urgency small { font-size: 0.85rem; font-weight: 600; color: var(--ink); }
+
+.urgency-u1::before { background: var(--u1); }
+.urgency-u1 strong { color: var(--u1); }
+.urgency-u2::before { background: var(--u2); }
+.urgency-u2 strong { color: var(--u2); }
+.urgency-u3::before { background: var(--u3); }
+.urgency-u3 strong { color: var(--u3); }
+.urgency-u4::before { background: var(--u4); }
+.urgency-u4 strong { color: var(--u4); }
+.urgency-u5::before { background: var(--u5); }
+.urgency-u5 strong { color: var(--u5); }
 
 .case-list { display: grid; gap: .75rem; }
 .case-card { display: grid; grid-template-columns: 2.25rem minmax(0, 1fr) auto; align-items: start; gap: .9rem; border: 1px solid var(--border); border-left: 5px solid #7b8794; border-radius: 8px; padding: .9rem; }
