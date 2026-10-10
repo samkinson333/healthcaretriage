@@ -123,12 +123,13 @@ export default function App() {
 
           {activeTab === 'intake' && (
             <div className="layout">
-              <PatientPanel
-                patients={patients}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
-                onRegistered={handleRegistered}
-              />
+<PatientPanel
+            patients={patients}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onRegistered={handleRegistered}
+            queueCount={queue.length}
+          />
               <VitalsForm patient={selectedPatient} onSubmitted={handleSubmitted} />
               <VitalsSummary patient={selectedPatient} measurements={measurements} />
               <TriageAssessment patient={selectedPatient} onCreated={() => {

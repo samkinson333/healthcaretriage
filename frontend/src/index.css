@@ -250,6 +250,29 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
 }
 
+.panel-heading { align-items: center; display: flex; gap: .6rem; justify-content: space-between; }
+.panel-heading h2 { margin: 0; }
+.count-pill { background: var(--accent-soft); border-radius: 999px; color: var(--accent); font-size: .75rem; font-weight: 700; padding: .2rem .5rem; }
+
+.quick-add .hint { margin-bottom: .65rem; }
+.quick-add kbd { background: #eef1f4; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; font-size: .78rem; padding: .05rem .35rem; }
+.quick-add-row { align-items: flex-end; display: flex; flex-wrap: wrap; gap: .75rem; }
+.quick-add-row .field { margin-bottom: 0; }
+.field-age { width: 6.5rem; }
+.field-age input { font-size: 1.05rem; font-weight: 600; text-align: center; }
+.field-name { flex: 1 1 12rem; min-width: 0; }
+.field-sex { border: 0; margin: 0; padding: 0; }
+.field-sex legend { font-size: .82rem; font-weight: 600; margin: 0 0 .35rem; padding: 0; }
+.segmented { display: inline-flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.seg { align-items: center; cursor: pointer; display: inline-flex; gap: .3rem; font-size: .85rem; padding: .55rem .75rem; }
+.seg + .seg { border-left: 1px solid var(--border); }
+.seg input { accent-color: var(--accent); margin: 0; }
+.seg.is-active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.quick-add .btn { margin-top: 0; }
+.req { color: var(--error); font-weight: 700; }
+.opt { color: var(--muted); font-weight: 400; }
+.select-existing { margin-top: 1rem; }
+
 .field {
   display: flex;
   flex-direction: column;
@@ -358,6 +381,11 @@ select:disabled {
 .notice-error {
   background: var(--error-soft);
   color: var(--error);
+}
+
+.notice-warning {
+  background: var(--warning-soft);
+  color: var(--warning);
 }
 
 .subform {
